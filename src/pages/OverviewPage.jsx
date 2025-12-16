@@ -23,12 +23,12 @@ export default function OverviewPage() {
         const payload = await apiRequest(DASHBOARD_COUNT_API_URL);
         
         const totalUsers = Number(payload?.totalUser ?? 0);
-        const bannedUsers = Number(payload?.totalBanUsers ?? 0);
+        const blockedUsers = Number(payload?.totalBanUsers ?? 0);
         const totalPets = Number(payload?.totalPets ?? 0);
-        const bannedPets = Number(payload?.totalBanPets ?? 0);
+        const blockedPets = Number(payload?.totalBanPets ?? 0);
 
-        const activeUsers = Math.max(totalUsers - bannedUsers, 0);
-        const activePets = Math.max(totalPets - bannedPets, 0);
+        const activeUsers = Math.max(totalUsers - blockedUsers, 0);
+        const activePets = Math.max(totalPets - blockedPets, 0);
 
         // Extract new user and active user data
         const newUser = payload?.newUser;
@@ -44,11 +44,11 @@ export default function OverviewPage() {
               state: { statusFilter: 'all' },
             },
             {
-              label: 'Banned users',
-              value: bannedUsers,
+              label: 'Blocked users',
+              value: blockedUsers,
               note: 'Need review',
               route: '/dashboard/users',
-              state: { statusFilter: 'banned' },
+              state: { statusFilter: 'blocked' },
             },
             {
               label: 'Total pets',
@@ -58,11 +58,11 @@ export default function OverviewPage() {
               state: { statusFilter: 'all' },
             },
             {
-              label: 'Banned pets',
-              value: bannedPets,
+              label: 'Blocked pets',
+              value: blockedPets,
               note: 'Take action',
               route: '/dashboard/pets',
-              state: { statusFilter: 'banned' },
+              state: { statusFilter: 'blocked' },
             },
           ]);
 

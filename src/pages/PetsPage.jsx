@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { BAN_PET_API_URL, BREEDS_API_URL, DELETE_PET_API_URL, PERSONALITIES_API_URL, PETS_API_URL, TYPES_API_URL } from '../api/endpoints';
+import { BAN_PET_API_URL as BLOCK_PET_API_URL, BREEDS_API_URL, DELETE_PET_API_URL, PERSONALITIES_API_URL, PETS_API_URL, TYPES_API_URL } from '../api/endpoints';
 import { apiRequest } from '../api/http';
 
 const STATUS_OPTIONS = [
     { value: 'all', label: 'All statuses' },
     { value: 'enabled', label: 'Enabled' },
     { value: 'disabled', label: 'Disabled' },
-    { value: 'banned', label: 'Banned' },
+    { value: 'blocked', label: 'Blocked' },
 ];
 
 function normalizePets(rawPets = []) {
@@ -33,7 +33,7 @@ function normalizePets(rawPets = []) {
             lookingFor: pet.lookingFor ?? '-',
             isEnabled,
             isBan,
-            status: isBan ? 'banned' : isEnabled ? 'enabled' : 'disabled',
+            status: isBan ? 'blocked' : isEnabled ? 'enabled' : 'disabled',
       personalities,
         };
     });
@@ -60,7 +60,7 @@ export default function PetsPage() {
     const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [banLoadingIds, setBanLoadingIds] = useState(new Set());
+    const [blockLoadingIds, setBlockLoadingIds] = useState(new Set());
     const [deleteLoadingIds, setDeleteLoadingIds] = useState(new Set());
     const [types, setTypes] = useState([]);
     const [breeds, setBreeds] = useState([]);
@@ -72,8 +72,8 @@ export default function PetsPage() {
     const [personalitiesLoading, setPersonalitiesLoading] = useState(false);
     const [personalitiesError, setPersonalitiesError] = useState('');
 
-    const setBanLoadingState = (petId, isLoading) => {
-        setBanLoadingIds((prev) => {
+    const setBlockLoadingState = (petId, isLoading) => {
+        setBlockLoadingIds((prev) => {
             const next = new Set(prev);
             if (isLoading) {
                 next.add(petId);
@@ -297,11 +297,11 @@ export default function PetsPage() {
         }
     };
 
-    const handleBanToggle = async (pet) => {
+    const handleBlockToggle = async (pet) => {
         const nextIsBan = !pet.isBan;
         try {
-            setBanLoadingState(pet.id, true);
-            await apiRequest(BAN_PET_API_URL, {
+            setBlockLoadingState(pet.id, true);
+            await apiRequest(BLOCK_PET_API_URL, {
                 method: 'POST',
                 body: JSON.stringify({
                     isBan: nextIsBan,
@@ -315,16 +315,16 @@ export default function PetsPage() {
                               ...entry,
                               isBan: nextIsBan,
                               isEnabled: nextIsBan ? false : true,
-                              status: nextIsBan ? 'banned' : 'enabled',
+                              status: nextIsBan ? 'blocked' : 'enabled',
                           }
                         : entry,
                 ),
             );
         } catch (err) {
             console.error(err);
-            alert('Ban toggle failed. Verify the API URL or try again.');
+            alert('Block toggle failed. Verify the API URL or try again.');
         } finally {
-            setBanLoadingState(pet.id, false);
+            setBlockLoadingState(pet.id, false);
         }
     };
 
@@ -466,7 +466,7 @@ export default function PetsPage() {
                         <tbody>
                             {filteredPets.length > 0 ? (
                                 filteredPets.map((pet) => {
-                                    const isBanLoading = banLoadingIds.has(pet.id);
+                                    const isBlockLoading = blockLoadingIds.has(pet.id);
                                     return (
                                         <tr key={pet.id}>
                                         <td>{pet.name}</td>
@@ -487,7 +487,7 @@ export default function PetsPage() {
                         </div>
                       </td>
                                         <td>
-                                            <span className={`badge ${pet.status === 'banned' ? 'danger' : 'success'}`}>
+                                            <span className={`badge ${pet.status === 'blocked' ? 'danger' : 'success'}`}>
                                                 {pet.status}
                                             </span>
                                         </td>
@@ -500,10 +500,10 @@ export default function PetsPage() {
                                             <button
                                                 type="button"
                                                 className="ghost"
-                                                disabled={isBanLoading}
-                                                onClick={() => handleBanToggle(pet)}
+                                                disabled={isBlockLoading}
+                                                onClick={() => handleBlockToggle(pet)}
                                             >
-                                                {isBanLoading ? 'Updating…' : pet.isBan ? 'Remove ban' : 'Ban'}
+                                                {isBlockLoading ? 'Updating…' : pet.isBan ? 'Unblock' : 'Block'}
                                             </button>
                                             <button
                                                 type="button"

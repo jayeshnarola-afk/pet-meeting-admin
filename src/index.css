@@ -3,9 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -26,11 +26,20 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  color: #213547;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #213547;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+p {
+  color: #213547;
 }
 
 button {
@@ -40,7 +49,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #f9f9f9;
+  color: #213547;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -52,15 +62,21 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Removed media query to ensure consistent colors across all devices */
+
+/* Ensure text elements have black color by default */
+section {
+  color: #213547;
+}
+
+td, th {
+  color: #213547;
+}
+
+li {
+  color: #213547;
+}
+
+strong {
+  color: #213547;
 }

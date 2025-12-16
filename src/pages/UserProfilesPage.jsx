@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_BASE_URL, BAN_PET_API_URL, BLOCK_IMAGE_API_URL, BLOCK_USER_IMAGE_API_URL, DELETE_PET_API_URL, USERS_API_URL } from '../api/endpoints';
+import { API_BASE_URL, BAN_PET_API_URL as BLOCK_PET_API_URL, BLOCK_IMAGE_API_URL, BLOCK_USER_IMAGE_API_URL, DELETE_PET_API_URL, USERS_API_URL } from '../api/endpoints';
 import { apiRequest } from '../api/http';
 
 const ensureAbsoluteUrl = (url) => {
@@ -92,7 +92,7 @@ function normalizeUsers(rawUsers = []) {
               id: pet.id ?? crypto.randomUUID?.() ?? Math.random().toString(36).slice(2, 9),
               name: pet.name ?? 'Unnamed pet',
               images: limitedImages,
-              isBan: pet.isBan === true || pet.isBan === 'true',
+              isBlock: pet.isBan === true || pet.isBan === 'true',
             };
           })
         : [];
@@ -141,7 +141,7 @@ export default function UserProfilesPage() {
   const [blockedImageUrls, setBlockedImageUrls] = useState(new Set());
   const [unblockedImageUrls, setUnblockedImageUrls] = useState(new Set());
   const [failedImageUrls, setFailedImageUrls] = useState(new Set());
-  const [banLoadingIds, setBanLoadingIds] = useState(new Set());
+  const [blockLoadingIds, setBlockLoadingIds] = useState(new Set());
   const [deleteLoadingIds, setDeleteLoadingIds] = useState(new Set());
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -315,28 +315,28 @@ export default function UserProfilesPage() {
     }
   };
 
-  const handleBanToggle = async (petId, nextIsBan) => {
-    setBanLoadingIds((prev) => new Set(prev).add(petId));
+  const handleBlockToggle = async (petId, nextIsBlock) => {
+    setBlockLoadingIds((prev) => new Set(prev).add(petId));
     try {
-      await apiRequest(BAN_PET_API_URL, {
+      await apiRequest(BLOCK_PET_API_URL, {
         method: 'POST',
-        body: JSON.stringify({ petId, isBan: nextIsBan }),
+        body: JSON.stringify({ petId, isBan: nextIsBlock }),
       });
       setUsers((prev) =>
         prev.map((user) => ({
           ...user,
           pets: user.pets.map((pet) =>
             pet.id === petId
-              ? { ...pet, isBan: nextIsBan }
+              ? { ...pet, isBlock: nextIsBlock }
               : pet,
           ),
         })),
       );
     } catch (err) {
       console.error(err);
-      alert('Ban toggle failed. Verify the API URL or try again.');
+      alert('Block toggle failed. Verify the API URL or try again.');
     } finally {
-      setBanLoadingIds((prev) => {
+      setBlockLoadingIds((prev) => {
         const next = new Set(prev);
         next.delete(petId);
         return next;
@@ -499,10 +499,10 @@ export default function UserProfilesPage() {
                               type="button"
                               className="outline"
                               style={{ padding: '0.35rem 0.7rem', fontSize: '0.82rem' }}
-                              disabled={banLoadingIds.has(pet.id)}
-                              onClick={() => handleBanToggle(pet.id, !pet.isBan)}
+                              disabled={blockLoadingIds.has(pet.id)}
+                              onClick={() => handleBlockToggle(pet.id, !pet.isBlock)}
                             >
-                              {banLoadingIds.has(pet.id) ? 'Updating…' : pet.isBan ? 'Unban' : 'Ban'}
+                              {blockLoadingIds.has(pet.id) ? 'Updating…' : pet.isBlock ? 'Unblock' : 'Block'}
                             </button>
                             <button
                               type="button"

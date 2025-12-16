@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { BAN_USER_API_URL, DELETE_USER_API_URL, USERS_API_URL } from '../api/endpoints';
+import { BAN_USER_API_URL as BLOCK_USER_API_URL, DELETE_USER_API_URL, USERS_API_URL } from '../api/endpoints';
 import { apiRequest } from '../api/http';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All statuses' },
   { value: 'active', label: 'Active' },
-  { value: 'banned', label: 'Banned' },
+  { value: 'blocked', label: 'Blocked' },
 ];
 
 const PET_PREVIEW_LIMIT = 3;
 
 function normalizeUsers(rawUsers = []) {
   return rawUsers.map((user) => {
-    const status = user.isBan ? 'banned' : 'active';
+    const status = user.isBan ? 'blocked' : 'active';
     const location = user.location ?? 'Not specified';
     const pets =
       Array.isArray(user.pets) && user.pets.length
@@ -26,7 +26,7 @@ function normalizeUsers(rawUsers = []) {
             gender: pet.gender ?? '-',
             size: pet.size ?? '-',
             color: pet.color ?? '-',
-            status: pet.isBan ? 'banned' : pet.isEnabled ? 'enabled' : 'disabled',
+            status: pet.isBan ? 'blocked' : pet.isEnabled ? 'enabled' : 'disabled',
           }))
         : [];
 
@@ -55,7 +55,7 @@ export default function UsersPage() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [banLoadingIds, setBanLoadingIds] = useState(new Set());
+  const [blockLoadingIds, setBlockLoadingIds] = useState(new Set());
   const [deleteLoadingIds, setDeleteLoadingIds] = useState(new Set());
   const [detailUser, setDetailUser] = useState(null);
 
@@ -119,12 +119,12 @@ export default function UsersPage() {
       if (statusFilter === 'all') {
         return true;
       }
-      return statusFilter === 'banned' ? user.isBan : !user.isBan;
+      return statusFilter === 'blocked' ? user.isBan : !user.isBan;
     });
   }, [users, statusFilter]);
 
-  const setBanLoadingState = (userId, isLoading) => {
-    setBanLoadingIds((prev) => {
+  const setBlockLoadingState = (userId, isLoading) => {
+    setBlockLoadingIds((prev) => {
       const next = new Set(prev);
       if (isLoading) {
         next.add(userId);
@@ -164,11 +164,11 @@ export default function UsersPage() {
     }
   };
 
-  const handleBanToggle = async (user) => {
+  const handleBlockToggle = async (user) => {
     const nextIsBan = !user.isBan;
     try {
-      setBanLoadingState(user.id, true);
-      await apiRequest(BAN_USER_API_URL, {
+      setBlockLoadingState(user.id, true);
+      await apiRequest(BLOCK_USER_API_URL, {
         method: 'POST',
         body: JSON.stringify({
           userId: user.id,
@@ -177,14 +177,14 @@ export default function UsersPage() {
       });
       setUsers((prev) =>
         prev.map((entry) =>
-          entry.id === user.id ? { ...entry, isBan: nextIsBan, status: nextIsBan ? 'banned' : 'active' } : entry,
+          entry.id === user.id ? { ...entry, isBan: nextIsBan, status: nextIsBan ? 'blocked' : 'active' } : entry,
         ),
       );
     } catch (err) {
       console.error(err);
-      alert('Ban toggle failed. Verify the API URL or try again.');
+      alert('Block toggle failed. Verify the API URL or try again.');
     } finally {
-      setBanLoadingState(user.id, false);
+      setBlockLoadingState(user.id, false);
     }
   };
 
@@ -230,7 +230,7 @@ export default function UsersPage() {
             </thead>
             <tbody>
               {filteredUsers.map((user) => {
-                const isBanLoading = banLoadingIds.has(user.id);
+                const isBlockLoading = blockLoadingIds.has(user.id);
                 const isDeleteLoading = deleteLoadingIds.has(user.id);
                 const petPreview = user.pets.slice(0, PET_PREVIEW_LIMIT);
                 const remainingPets = user.pets.length - petPreview.length;
@@ -255,7 +255,7 @@ export default function UsersPage() {
                       </div>
                     </td>
                     <td>
-                      <span className={`badge ${user.status === 'banned' ? 'danger' : 'success'}`}>
+                      <span className={`badge ${user.status === 'blocked' ? 'danger' : 'success'}`}>
                         {user.status}
                       </span>
                     </td>
@@ -263,10 +263,10 @@ export default function UsersPage() {
                       <button
                         type="button"
                         className="ghost"
-                        disabled={isBanLoading}
-                        onClick={() => handleBanToggle(user)}
+                        disabled={isBlockLoading}
+                        onClick={() => handleBlockToggle(user)}
                       >
-                        {isBanLoading ? 'Updating...' : user.isBan ? 'Remove ban' : 'Ban'}
+                        {isBlockLoading ? 'Updating...' : user.isBan ? 'Unblock' : 'Block'}
                       </button>
                       <button
                         type="button"
@@ -339,7 +339,7 @@ export default function UsersPage() {
                     <article key={pet.id} className="pet-card">
                       <header>
                         <strong>{pet.name}</strong>
-                        <span className={`badge ${pet.status === 'banned' ? 'danger' : 'success'}`}>{pet.status}</span>
+                        <span className={`badge ${pet.status === 'blocked' ? 'danger' : 'success'}`}>{pet.status}</span>
                       </header>
                       <ul>
                         <li>
