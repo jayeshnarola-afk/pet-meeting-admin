@@ -29,7 +29,7 @@ export default function LoginPage() {
       <form className="login-card" onSubmit={handleSubmit}>
         <h1>Dashboard Login</h1>
         <p className="muted">
-          Demo credentials: <strong>{STATIC_LOGIN.email}</strong> / <strong>{STATIC_LOGIN.password}</strong>
+          {/* Demo credentials: <strong>{STATIC_LOGIN.email}</strong> / <strong>{STATIC_LOGIN.password}</strong> */}
         </p>
 
         <label>
@@ -38,7 +38,7 @@ export default function LoginPage() {
             type="email"
             value={formState.email}
             onChange={(event) => setFormState({ ...formState, email: event.target.value })}
-            placeholder="admin@deshboard.com"
+            // placeholder="admin@deshboard.com"
             required
           />
         </label>

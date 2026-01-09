@@ -39,7 +39,7 @@ export default function DashboardLayout() {
           <header className="app-bar">
             <div>
               <p className="muted">Logged in as</p>
-              <strong>{userEmail || 'admin@deshboard.com'}</strong>
+              <strong>{userEmail || 'admin@gmail.com'}</strong>
             </div>
             <button type="button" className="outline" onClick={logout}>
               Logout
