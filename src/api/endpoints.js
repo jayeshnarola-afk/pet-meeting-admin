@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://10.1.0.14:4000';
+export const API_BASE_URL = 'http://13.50.250.95:4000';
 export const USERS_API_URL = `${API_BASE_URL}/admin/api/user/list`;
 export const BAN_USER_API_URL = `${API_BASE_URL}/admin/api/user/banUser`;
 export const DELETE_USER_API_URL = `${API_BASE_URL}/admin/api/user`;
