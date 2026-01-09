@@ -1,10 +1,10 @@
 // Use CORS proxy for production to bypass Mixed Content errors
-const BACKEND_API = 'http://13.50.250.95:4000';
-const CORS_PROXY = 'https://corsproxy.io/?';
+const API_BASE_URL = 'http://13.50.250.95:4000';
+// const CORS_PROXY = 'https://corsproxy.io/?';
 
-export const API_BASE_URL = import.meta.env.MODE === 'production' 
-  ? `${CORS_PROXY}${encodeURIComponent(BACKEND_API)}`
-  : BACKEND_API;
+// export const API_BASE_URL = import.meta.env.MODE === 'production' 
+//   ? `${CORS_PROXY}${encodeURIComponent(BACKEND_API)}`
+//   : BACKEND_API;
 export const USERS_API_URL = `${API_BASE_URL}/admin/api/user/list`;
 export const BAN_USER_API_URL = `${API_BASE_URL}/admin/api/user/banUser`;
 export const DELETE_USER_API_URL = `${API_BASE_URL}/admin/api/user`;
